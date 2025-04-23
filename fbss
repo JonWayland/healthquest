@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Presentation</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #4f46e5;
+            --accent: #8b5cf6;
+            --dark: #1e293b;
+            --light: #f1f5f9;
+            --text-dark: #334155;
+            --text-medium: #475569;
+            --text-light: #64748b;
+            --background: #ffffff;
+            --background-alt: #f8fafc;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--background), var(--background-alt));
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .presentation-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: all;
+            z-index: 2;
+        }
+        
+        .slide-content {
+            max-width: 1200px;
+            width: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .slide-header {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+        }
+        
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        h3 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        p {
+            font-size: 1.25rem;
+            line-height: 1.75;
+            color: var(--text-medium);
+            max-width: 800px;
+        }
+        
+        .description {
+            font-size: 1.5rem;
+            line-height: 1.75;
+            color: var(--text-medium);
+            max-width: 800px;
+        }
+        
+        .image-placeholder {
+            /* removed width: 100%; */
+	    width: auto;
+	    max-width: 100%;
+            height: 400px;
+	    align-self: center; /* centers the box in its flex column parent */
+            background: rgba(79, 70, 229, 0.05);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(79, 70, 229, 0.1);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(79, 70, 229, 0.08);
+        }
+        
+        .image-placeholder::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.05), rgba(37, 99, 235, 0.05));
+            z-index: 1;
+        }
+        
+        .image-placeholder img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            opacity: 0.9;
+            z-index: 2;
+        }
+        
+        .navigation {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+        
+        .nav-button {
+            background: rgba(79, 70, 229, 0.05);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-medium);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-button:hover {
+            background: rgba(79, 70, 229, 0.1);
+            transform: translateY(-2px);
+            color: var(--text-dark);
+        }
+        
+        .nav-button.primary {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+        }
+        
+        .nav-button.primary:hover {
+            background: linear-gradient(to right, var(--primary-dark), var(--secondary));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        .page-indicator {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-medium);
+            z-index: 100;
+        }
+        
+        /* Grid Layouts */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(79, 70, 229, 0.1);
+            height: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            background: white;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.08);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+        }
+        
+        .card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .card p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-medium);
+        }
+        
+        .use-case-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .use-case {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(79, 70, 229, 0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+        
+        .use-case:hover {
+            transform: translateY(-5px);
+            background: white;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.08);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+        }
+        
+        .use-case h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .use-case p {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-medium);
+        }
+        
+        .enablement-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .enablement-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(79, 70, 229, 0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            aspect-ratio: 1/1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+        
+        .enablement-card:hover {
+            transform: translateY(-5px);
+            background: white;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.08);
+            border: 1px solid rgba(79, 70, 229, 0.2);
+        }
+        
+        .enablement-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .enablement-card p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-medium);
+        }
+
+
+	/* ---- Condense Analytics Enablement (slide 5) ---- */
+	#slide-5 .slide-header h1 {
+	  font-size: 3.5rem;
+	  margin-bottom: 0.25rem;
+	}
+	#slide-5 .slide-header p {
+	  font-size: 1.75rem;
+	  margin-bottom: 1rem;
+	}
+	#slide-5 .slide-content {
+	  gap: 2.5rem;
+	}
+	#slide-5 .enablement-grid {
+	  gap: 2rem;
+	  margin-top: 2.5rem;
+	  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	}
+	#slide-5 .enablement-card {
+	  padding: 2.0rem;
+	  aspect-ratio: auto; /* remove the forced square */
+	}
+	#slide-5 .enablement-card h3 {
+	  font-size: 1.0rem;
+	  margin-bottom: 0.5rem;
+	}
+	#slide-5 .enablement-card p {
+	  font-size: 1.0rem;
+	}
+	#slide-5 .icon-placeholder {
+	  width: 48px;
+	  height: 48px;
+	  margin-bottom: 0.5rem;
+	  font-size: 1.25rem;
+	}
+	/* ----------------------------------------------- */
+
+        
+        .icon-placeholder {
+            width: 64px;
+            height: 64px;
+            background: rgba(79, 70, 229, 0.08);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: var(--primary);
+            box-shadow: 0 4px 8px rgba(79, 70, 229, 0.1);
+        }
+        
+        .use-case-detailed {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(79, 70, 229, 0.1);
+            margin-top: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+        
+        .use-case-detailed h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+        
+        .step {
+            display: flex;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+        
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            flex-shrink: 0;
+            color: white;
+            box-shadow: 0 4px 8px rgba(79, 70, 229, 0.15);
+        }
+        
+        .step-content {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        
+        .step-description {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-medium);
+        }
+
+	/* only for slide 2, bump top/bottom padding to give more headroom and footroom */
+	#slide-2 {
+  	    padding: 4rem 2rem;
+	}
+
+    </style>
+</head>
+<body>
+    <div class="glowing-circle"></div>
+    <div class="glowing-circle"></div>
+    
+    <div class="presentation-container">
+        <!-- Slide 1: Welcome Page -->
+        <div class="slide active" id="slide-1">
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h1>Tech-Infused Productivity: Streamlining Analytics</h1>
+                    <p class="description">Traveling on the technology transit with brief stops inside of Florida Blue's technological ecosystem.</p>
+                </div>
+                <div class="image-placeholder">
+                    <img src="CA.png" alt="Technology Image">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 2: Generative AI Landscape -->
+        <div class="slide" id="slide-2">
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h1>The Generative AI Landscape</h1>
+                    <p>A short overview of leading technologies and platforms in the broader AI market.</p>
+                </div>
+                
+                <!-- LLM Section -->
+                <div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06); border: 1px solid rgba(79, 70, 229, 0.1); margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.8rem; color: var(--primary); margin-bottom: 1.5rem; border-bottom: 2px solid rgba(79, 70, 229, 0.1); padding-bottom: 0.75rem;">Large Language Models</h2>
+                    <div style="display: flex; flex-wrap: wrap; gap: 1.5rem;">
+                        <div style="flex: 1; min-width: 180px; background: rgba(79, 70, 229, 0.03); padding: 1.25rem; border-radius: 12px; border-left: 4px solid var(--primary);">
+                            <div style="font-weight: 700; font-size: 1.2rem; color: var(--text-dark);">OpenAI</div>
+                            <div style="color: var(--text-medium); margin-top: 0.5rem; display: flex; align-items: center;">
+                                <span style="height: 8px; width: 8px; background: var(--primary); border-radius: 50%; margin-right: 8px;"></span>
+                                o3
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem;">April 16, 2025</div>
+                        </div>
+                        <div style="flex: 1; min-width: 180px; background: rgba(79, 70, 229, 0.03); padding: 1.25rem; border-radius: 12px; border-left: 4px solid var(--primary);">
+                            <div style="font-weight: 700; font-size: 1.2rem; color: var(--text-dark);">Google</div>
+                            <div style="color: var(--text-medium); margin-top: 0.5rem; display: flex; align-items: center;">
+                                <span style="height: 8px; width: 8px; background: var(--primary); border-radius: 50%; margin-right: 8px;"></span>
+                                Gemini 2.5
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem;">Mar 25, 2025</div>
+                        </div>
+                        <div style="flex: 1; min-width: 180px; background: rgba(139, 92, 246, 0.08); padding: 1.25rem; border-radius: 12px; border-left: 4px solid var(--accent); position: relative;">
+                            <div style="position: absolute; top: -10px; right: -10px; background: var(--accent); color: white; font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: 12px;">FEATURED</div>
+                            <div style="font-weight: 700; font-size: 1.2rem; color: var(--text-dark);">Anthropic</div>
+                            <div style="color: var(--accent); font-weight: 600; margin-top: 0.5rem; display: flex; align-items: center;">
+                                <span style="height: 8px; width: 8px; background: var(--accent); border-radius: 50%; margin-right: 8px;"></span>
+                                Claude 3.7
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem; font-weight: 600;">February 24, 2025</div>
+                        </div>
+                        <div style="flex: 1; min-width: 180px; background: rgba(79, 70, 229, 0.03); padding: 1.25rem; border-radius: 12px; border-left: 4px solid var(--primary);">
+                            <div style="font-weight: 700; font-size: 1.2rem; color: var(--text-dark);">X</div>
+                            <div style="color: var(--text-medium); margin-top: 0.5rem; display: flex; align-items: center;">
+                                <span style="height: 8px; width: 8px; background: var(--primary); border-radius: 50%; margin-right: 8px;"></span>
+                                Grok 3
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem; font-weight: 600;">February 17, 2025</div>
+                        </div>
+                        <div style="flex: 1; min-width: 180px; background: rgba(79, 70, 229, 0.03); padding: 1.25rem; border-radius: 12px; border-left: 4px solid var(--primary); position: relative;">
+                            <div style="position: absolute; top: -10px; right: -10px; background: #10b981; color: white; font-size: 0.7rem; font-weight: 600; padding: 0.25rem 0.5rem; border-radius: 12px;">OPEN-SOURCE</div>
+                            <div style="font-weight: 700; font-size: 1.2rem; color: var(--text-dark);">Meta</div>
+                            <div style="color: var(--text-medium); margin-top: 0.5rem; display: flex; align-items: center;">
+                                <span style="height: 8px; width: 8px; background: var(--primary); border-radius: 50%; margin-right: 8px;"></span>
+                                Llama 4
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem;">April 5, 2025</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Other AI Technologies -->
+                <div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06); border: 1px solid rgba(79, 70, 229, 0.1);">
+                    <h2 style="font-size: 1.8rem; color: var(--primary); margin-bottom: 1.5rem; border-bottom: 2px solid rgba(79, 70, 229, 0.1); padding-bottom: 0.75rem;">Other Generative AI Technologies</h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+                        <!-- Transcription -->
+                        <div style="text-align: center; padding: 1.5rem; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); border: 1px solid rgba(79, 70, 229, 0.1); transition: all 0.3s ease;">
+                            <div style="width: 80px; height: 80px; background: rgba(79, 70, 229, 0.06); border-radius: 50%; margin: 0 auto 1rem; display: flex; justify-content: center; align-items: center;">
+                                <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 24 24' fill='none' stroke='%234F46E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z'%3E%3C/path%3E%3Cpath d='M19 10v2a7 7 0 0 1-14 0v-2'%3E%3C/path%3E%3Cline x1='12' y1='19' x2='12' y2='23'%3E%3C/line%3E%3Cline x1='8' y1='23' x2='16' y2='23'%3E%3C/line%3E%3C/svg%3E" alt="Transcription">
+                            </div>
+                            <h3 style="font-size: 1.4rem; margin-bottom: 1rem; color: var(--text-dark);">Transcription</h3>
+                            <div style="display: inline-block; background: rgba(79, 70, 229, 0.08); padding: 0.5rem 1rem; border-radius: 20px; margin-bottom: 0.5rem;">
+                                <span style="font-weight: 600; color: var(--primary);">OpenAI</span>
+                                <span style="color: var(--text-medium); margin-left: 4px;">- Whisper</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Image -->
+                        <div style="text-align: center; padding: 1.5rem; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); border: 1px solid rgba(79, 70, 229, 0.1); transition: all 0.3s ease;">
+                            <div style="width: 80px; height: 80px; background: rgba(79, 70, 229, 0.06); border-radius: 50%; margin: 0 auto 1rem; display: flex; justify-content: center; align-items: center;">
+                                <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 24 24' fill='none' stroke='%234F46E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'%3E%3C/circle%3E%3Cpolyline points='21 15 16 10 5 21'%3E%3C/polyline%3E%3C/svg%3E" alt="Image">
+                            </div>
+                            <h3 style="font-size: 1.4rem; margin-bottom: 1rem; color: var(--text-dark);">Image</h3>
+                            <div style="display: inline-block; background: rgba(79, 70, 229, 0.08); padding: 0.5rem 1rem; border-radius: 20px; margin-bottom: 0.5rem;">
+                                <span style="font-weight: 600; color: var(--primary);">OpenAI</span>
+                                <span style="color: var(--text-medium); margin-left: 4px;">- 4o</span>
+                            </div>
+                            <div style="display: inline-block; background: rgba(79, 70, 229, 0.08); padding: 0.5rem 1rem; border-radius: 20px; margin-bottom: 0.5rem;">
+                                <span style="font-weight: 600; color: var(--primary);">MidJourney</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Music -->
+                        <div style="text-align: center; padding: 1.5rem; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); border: 1px solid rgba(79, 70, 229, 0.1); transition: all 0.3s ease;">
+                            <div style="width: 80px; height: 80px; background: rgba(79, 70, 229, 0.06); border-radius: 50%; margin: 0 auto 1rem; display: flex; justify-content: center; align-items: center;">
+                                <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 24 24' fill='none' stroke='%234F46E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18V5l12-2v13'%3E%3C/path%3E%3Ccircle cx='6' cy='18' r='3'%3E%3C/circle%3E%3Ccircle cx='18' cy='16' r='3'%3E%3C/circle%3E%3C/svg%3E" alt="Music">
+                            </div>
+                            <h3 style="font-size: 1.4rem; margin-bottom: 1rem; color: var(--text-dark);">Music</h3>
+                            <div style="display: inline-block; background: rgba(79, 70, 229, 0.08); padding: 0.5rem 1rem; border-radius: 20px; margin-bottom: 0.5rem;">
+                                <span style="font-weight: 600; color: var(--primary);">SunoAI</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Video -->
+                        <div style="text-align: center; padding: 1.5rem; border-radius: 12px; background: white; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); border: 1px solid rgba(79, 70, 229, 0.1); transition: all 0.3s ease;">
+                            <div style="width: 80px; height: 80px; background: rgba(79, 70, 229, 0.06); border-radius: 50%; margin: 0 auto 1rem; display: flex; justify-content: center; align-items: center;">
+                                <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 24 24' fill='none' stroke='%234F46E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolygon points='23 7 16 12 23 17 23 7'%3E%3C/polygon%3E%3Crect x='1' y='5' width='15' height='14' rx='2' ry='2'%3E%3C/rect%3E%3C/svg%3E" alt="Video">
+                            </div>
+                            <h3 style="font-size: 1.4rem; margin-bottom: 1rem; color: var(--text-dark);">Video</h3>
+                            <div style="display: inline-block; background: rgba(79, 70, 229, 0.08); padding: 0.5rem 1rem; border-radius: 20px; margin-bottom: 0.5rem;">
+                                <span style="font-weight: 600; color: var(--primary);">OpenAI</span>
+                                <span style="color: var(--text-medium); margin-left: 4px;">- Sora</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 3: Vibing -->
+        <div class="slide" id="slide-3">
+            <div class="slide-content">
+                <div style="display: flex; align-items: center; gap: 2rem; margin-bottom: 2rem;">
+                    <div style="flex: 3;">
+                        <div class="slide-header">
+                            <h1>Vibing</h1>
+                            <p>Exploring the transformative ways large language models are being integrated into everyday workflows.</p>
+                        </div>
+                    </div>
+                    <div style="flex: 2;">
+                        <img src="Vibe.png" alt="Vibing with AI" style="max-width: 100%; max-height: 180px; border-radius: 12px; box-shadow: 0 20px 40px rgba(79, 70, 229, 0.15);">
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1rem;">
+                    <!-- Vibe Coding -->
+                    <div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06); border: 1px solid rgba(79, 70, 229, 0.1); transition: all 0.3s ease; height: 100%;">
+                        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                            <div style="width: 48px; height: 48px; min-width: 48px; background: rgba(79, 70, 229, 0.08); border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-right: 1rem;">
+                                <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24
+24' fill='none' stroke='%234F46E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M16 18l6-6-6-6'%3E%3C/path%3E%3Cpath d='M8 6l-6 6 6 6'%3E%3C/path%3E%3C/svg%3E" alt="Code">
+                            </div>
+                            <h3 style="font-size: 1.3rem; margin: 0; color: var(--text-dark);">Vibe Coding</h3>
+                        </div>
+                        <p style="color: var(--text-medium);">Accelerating development by using AI to generate, debug, and optimize code while maintaining the programmer's personal style and standards.</p>
+                    </div>
+                    
+                    <!-- Vibe Marketing -->
+                    <div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06); border: 1px solid rgba(79, 70, 229, 0.1); transition: all 0.3s ease; height: 100%;">
+                        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                            <div style="width: 48px; height: 48px; min-width: 48px; background: rgba(79, 70, 229, 0.08); border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-right: 1rem;">
+                                <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234F46E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 20h9'%3E%3C/path%3E%3Cpath d='M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z'%3E%3C/path%3E%3C/svg%3E" alt="Marketing">
+                            </div>
+                            <h3 style="font-size: 1.3rem; margin: 0; color: var(--text-dark);">Vibe Marketing</h3>
+                        </div>
+                        <p style="color: var(--text-medium);">Creating personalized, brand-consistent marketing content that resonates with specific audience segments at unprecedented scale and speed.</p>
+                    </div>
+                    
+                    <!-- Vibe Research -->
+                    <div style="background: white; border-radius: 16px; padding: 1.5rem; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06); border: 1px solid rgba(79, 70, 229, 0.1); transition: all 0.3s ease; height: 100%;">
+                        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                            <div style="width: 48px; height: 48px; min-width: 48px; background: rgba(79, 70, 229, 0.08); border-radius: 12px; display: flex; justify-content: center; align-items: center; margin-right: 1rem;">
+                                <img src="data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234F46E5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cline x1='12' y1='16' x2='12' y2='12'%3E%3C/line%3E%3Cline x1='12' y1='8' x2='12.01' y2='8'%3E%3C/line%3E%3C/svg%3E" alt="Research">
+                            </div>
+                            <h3 style="font-size: 1.3rem; margin: 0; color: var(--text-dark);">Vibe Research</h3>
+                        </div>
+                        <p style="color: var(--text-medium);">Supercharging information gathering by analyzing vast amounts of data, summarizing complex topics, and identifying patterns that might be missed by human researchers.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 4: Internal AI-Boosting Technology -->
+        <div class="slide" id="slide-4">
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h1>Internal AI-Boosting Technology</h1>
+                    <p>Leveraging GPU servers adds upwards of a 25x improvement in machine learning at scale.</p>
+                </div>
+                
+                <div style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+                    <div style="flex: 2;">
+                        <div class="use-case-grid">
+                            <div class="use-case">
+                                <h3>Increased Speed of Model Training</h3>
+                                <p>GPU acceleration enables training complex AI models in minutes instead of hours or even days, dramatically reducing time-to-insight and allowing for rapid experimentation cycles.</p>
+                            </div>
+                            <div class="use-case">
+                                <h3>Unsupervised Model Training on Big Data</h3>
+                                <p>GPUs provide adequate memory for calculating distance matrices on millions of members at a single time.</p>
+                            </div>
+                            <div class="use-case">
+                                <h3>Deep Learning for Unstructured Data</h3>
+                                <p>The increased compute given to us by the GPUs allow us to process hundreds of millions of claims without summarizing or aggregating.</p>
+                            </div>
+                            <div class="use-case">
+                                <h3>Rapid Experimentation</h3>
+                                <p>High-performance compute allows us to iterate on various machine learning models and methods, dramatically accelerating the time to completion.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+                        <img src="GPU.png" alt="GPU Technology" style="max-width: 100%; max-height: 300px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 5: Analytics Enablement -->
+        <div class="slide" id="slide-5">
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h1>Analytics Enablement</h1>
+                    <p>Building the foundation for data-driven decision making across the organization.</p>
+                </div>
+                
+                <div class="enablement-grid">
+                    <div class="enablement-card">
+                        <div class="icon-placeholder">1</div>
+                        <h3>Data Integration</h3>
+                        <p>Unifying data from diverse sources into a cohesive ecosystem</p>
+                    </div>
+                    <div class="enablement-card">
+                        <div class="icon-placeholder">2</div>
+                        <h3>Self-Service Analytics</h3>
+                        <p>Empowering business users with tools to explore data independently</p>
+                    </div>
+                    <div class="enablement-card">
+                        <div class="icon-placeholder">3</div>
+                        <h3>Automated Reporting</h3>
+                        <p>Creating systematic processes for consistent insight delivery</p>
+                    </div>
+                    <div class="enablement-card">
+                        <div class="icon-placeholder">4</div>
+                        <h3>Predictive Modeling</h3>
+                        <p>Building forecasting capabilities to anticipate future trends</p>
+                    </div>
+                    <div class="enablement-card">
+                        <div class="icon-placeholder">5</div>
+                        <h3>Data Visualization</h3>
+                        <p>Transforming complex information into intuitive visual formats</p>
+                    </div>
+                    <div class="enablement-card">
+                        <div class="icon-placeholder">6</div>
+                        <h3>Insight Automation</h3>
+                        <p>Deploying AI to surface key findings automatically</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Slide 6: RMarkdown Automation Use Case -->
+        <div class="slide" id="slide-6">
+            <div class="slide-content">
+                <div class="slide-header">
+                    <h1>RMarkdown Automation</h1>
+                    <p>A deep dive into streamlining analytical workflows with automated reports.</p>
+                </div>
+                
+                <div class="use-case-detailed">
+                    <h3>Automating RMarkdown Workflows</h3>
+                    
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Template Creation</div>
+                            <div class="step-description">Design standardized RMarkdown templates with parameterized inputs that can be dynamically populated based on specific data needs.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Data Pipeline Integration</div>
+                            <div class="step-description">Connect RMarkdown documents to automated data pipelines that refresh underlying datasets on a scheduled basis.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Scheduled Rendering</div>
+                            <div class="step-description">Leverage orchestration tools to automatically render reports on predetermined schedules, ensuring stakeholders receive the latest insights.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Multi-format Output</div>
+                            <div class="step-description">Configure automated processes to generate reports in multiple formats (PDF, HTML, Word) to accommodate different stakeholder preferences.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-content">
+                            <div class="step-title">Automated Distribution</div>
+                            <div class="step-description">Implement distribution mechanisms that automatically deliver completed reports to relevant stakeholders via email, shared drives, or internal portals.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation Controls -->
+        <div class="navigation">
+            <button class="nav-button" id="prev-button">Previous</button>
+            <button class="nav-button primary" id="next-button">Next</button>
+        </div>
+        
+        <div class="page-indicator">
+            <span id="current-slide">1</span>/<span id="total-slides">6</span>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.slide');
+            const nextButton = document.getElementById('next-button');
+            const prevButton = document.getElementById('prev-button');
+            const currentSlideIndicator = document.getElementById('current-slide');
+            const totalSlidesIndicator = document.getElementById('total-slides');
+            
+            let currentSlideIndex = 0;
+            totalSlidesIndicator.textContent = slides.length;
+            
+            function updateSlideIndicator() {
+                currentSlideIndicator.textContent = currentSlideIndex + 1;
+            }
+            function showSlide(index) {
+                slides.forEach(slide => slide.classList.remove('active'));
+                slides[index].classList.add('active');
+                updateSlideIndicator();
+                prevButton.disabled = index === 0;
+                nextButton.disabled = index === slides.length - 1;
+                nextButton.textContent = index === slides.length - 1 ? 'Finish' : 'Next';
+            }
+            
+            function nextSlide() {
+                if (currentSlideIndex < slides.length - 1) {
+                    currentSlideIndex++;
+                    showSlide(currentSlideIndex);
+                }
+            }
+            function prevSlide() {
+                if (currentSlideIndex > 0) {
+                    currentSlideIndex--;
+                    showSlide(currentSlideIndex);
+                }
+            }
+            
+            nextButton.addEventListener('click', nextSlide);
+            prevButton.addEventListener('click', prevSlide);
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+                else if (e.key === 'ArrowLeft') prevSlide();
+            });
+            
+            showSlide(currentSlideIndex);
+        });
+    </script>
+</body>
+</html>
